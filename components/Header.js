@@ -15,8 +15,22 @@ const Header = () => {
             className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
             viewBox="0 0 24 24"
           >
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            <rect
+              x="3"
+              y="3"
+              width="18"
+              height="18"
+              rx="2"
+              ry="2"
+              fill="#4F46E5"
+            />
+            <path
+              d="M9 3V21M15 3V21M3 9H21M3 15H21"
+              stroke="#FFFFFF"
+              strokeWidth="2"
+            />
           </svg>
+
           <span className="ml-3 text-xl">Stock Management System</span>
         </a>
         <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">

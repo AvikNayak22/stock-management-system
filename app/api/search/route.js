@@ -2,6 +2,7 @@ import { MongoClient } from "mongodb";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
+  const searchQuery = request.nextUrl.searchParams.get("query");
   // Replace the uri string with your connection string.
   const uri =
     "mongodb+srv://nayakavik19:O2TFSAc4rntK2CBF@cluster0.oheyavz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -15,13 +16,13 @@ export async function GET(request) {
     const pipeline = [
       {
         $match: {
-          $or: [{ name: { $regex: searchQuery, $options: "i" } }],
+          $or: [{ slug: { $regex: searchQuery, $options: "i" } }],
         },
       },
       {
         $project: {
           _id: 0,
-          name: 1,
+          slug: 1,
           quantity: 1,
           price: 1,
         },
