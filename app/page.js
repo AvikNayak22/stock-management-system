@@ -9,6 +9,7 @@ export default function Home() {
   const [alert, setAlert] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(false);
   const [dropdown, setDropdown] = useState([]);
 
   useEffect(() => {
@@ -24,6 +25,21 @@ export default function Home() {
 
     fetchProducts();
   }, []);
+
+  const buttonAction = async (action, slug, initialQuantity) => {
+    //Immediately change the slug of the product
+    setLoadingAction(true);
+    const response = await fetch("/api/action", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action, slug, initialQuantity }),
+    });
+    let jsonResponse = await response.json();
+    console.log(jsonResponse);
+    setLoadingAction(false);
+  };
 
   const addProduct = async (e) => {
     e.preventDefault();
@@ -58,7 +74,7 @@ export default function Home() {
 
   const onDropDownEdit = async (e) => {
     setQuery(e.target.value);
-    if (!loading) {
+    if (query.length > 3) {
       setLoading(true);
       setDropdown([]);
       const response = await fetch(`/api/search?query=${query}`);
@@ -78,9 +94,6 @@ export default function Home() {
         <h1 className="text-2xl font-semibold mb-4">Search a product</h1>
         <div className="flex w-full gap-2 mb-2">
           <input
-            onBlur={() => {
-              setDropdown([]);
-            }}
             onChange={onDropDownEdit}
             type="text"
             placeholder="Search for product name..."
@@ -93,6 +106,8 @@ export default function Home() {
             <option value="category3">Category 3</option>
           </select>
         </div>
+
+        {/* loader section */}
         {loading && (
           <div className="flex justify-center items-center mt-4">
             <svg
@@ -120,6 +135,8 @@ export default function Home() {
             </svg>
           </div>
         )}
+
+        {/* dropdown container */}
         <div className="drop-container absolute w-[72vw] border-1 bg-purple-100 rounded-md ">
           {dropdown.map((item) => {
             return (
@@ -131,19 +148,29 @@ export default function Home() {
                   {item.slug} ({item.quantity} available for ₹{item.price})
                 </span>
                 <div className="mx-5">
-                  <span
-                    className="subtract cursor-pointer px-2 py-1 bg-purple-400 text-white rounded-lg text-lg 
-                  font-semibold  hover:bg-purple-600 transition duration-300 ease-in-out"
+                  <button
+                    onClick={() => {
+                      buttonAction("minus", item.slug, item.quantity);
+                    }}
+                    disabled={loadingAction}
+                    className="subtract cursor-pointer px-2 bg-purple-500 text-white rounded-lg text-lg 
+                  font-semibold  hover:bg-purple-600 transition duration-300 ease-in-out disabled:bg-purple-200"
                   >
                     -
+                  </button>
+                  <span className="quantity inline-block min-w-3 mx-3">
+                    {item.quantity}
                   </span>
-                  <span className="quantity mx-3">{item.quantity}</span>
-                  <span
-                    className="add cursor-pointer px-2 py-1 bg-purple-400 text-white rounded-lg text-lg 
-                  font-semibold hover:bg-purple-600 transition duration-300 ease-in-out"
+                  <button
+                    onClick={() => {
+                      buttonAction("plus", item.slug, item.quantity);
+                    }}
+                    disabled={loadingAction}
+                    className="add cursor-pointer px-2 bg-purple-500 text-white rounded-lg text-lg 
+                  font-semibold hover:bg-purple-600 transition duration-300 ease-in-out disabled:bg-purple-200"
                   >
                     +
-                  </span>
+                  </button>
                 </div>
               </div>
             );
@@ -191,7 +218,7 @@ export default function Home() {
           <button
             onClick={addProduct}
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md"
           >
             Add Product
           </button>
