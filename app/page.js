@@ -27,7 +27,28 @@ export default function Home() {
   }, []);
 
   const buttonAction = async (action, slug, initialQuantity) => {
-    //Immediately change the slug of the product
+    //Immediately change the quantity of the product with given slug in products
+    let index = products.findIndex((product) => product.slug === slug);
+    console.log(index);
+    let newProducts = JSON.parse(JSON.stringify(products));
+    if (action === "plus") {
+      newProducts[index].quantity = parseInt(initialQuantity) + 1;
+    } else {
+      newProducts[index].quantity = parseInt(initialQuantity) - 1;
+    }
+    setProducts(newProducts);
+
+    //Immediately change the quantity of the product with given slug in dropdown
+    let indexDrop = dropdown.findIndex((product) => product.slug === slug);
+    console.log(indexDrop);
+    let newDropdown = JSON.parse(JSON.stringify(dropdown));
+    if (action === "plus") {
+      newDropdown[indexDrop].quantity = parseInt(initialQuantity) + 1;
+    } else {
+      newDropdown[indexDrop].quantity = parseInt(initialQuantity) - 1;
+    }
+    setDropdown(newDropdown);
+
     setLoadingAction(true);
     const response = await fetch("/api/action", {
       method: "POST",
@@ -73,7 +94,9 @@ export default function Home() {
   };
 
   const onDropDownEdit = async (e) => {
-    setQuery(e.target.value);
+    let value = e.target.value;
+    setQuery(value);
+
     if (query.length > 3) {
       setLoading(true);
       setDropdown([]);
@@ -81,6 +104,8 @@ export default function Home() {
       const jsonResponse = await response.json();
       setDropdown(jsonResponse.products);
       setLoading(false);
+    } else {
+      setDropdown([]);
     }
   };
 
